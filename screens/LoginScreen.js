@@ -6,15 +6,36 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import { auth } from "../firebase";
 
 export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignUp = () => {
+    auth.createUserWithEmailAndPassword(email, password).then(userCredentials => {
+      const user = userCredentials.user
+      console.log('kullanici: ',user.email)
+    }).catch(error => alert(error.message))
+  };
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="e-Mail" />
+        <TextInput
+          style={styles.input}
+          placeholder="e-Mail"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+        />
 
-        <TextInput style={styles.input} placeholder="Parola" />
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          placeholder="Parola"
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+        />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -22,7 +43,10 @@ export default function LoginScreen() {
           <Text style={styles.buttonText}>Giris Yap</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.outlineButton]}>
+        <TouchableOpacity
+          style={[styles.button, styles.outlineButton]}
+          onPress={handleSignUp}
+        >
           <Text style={styles.outlineButtonText}>Kayit Ol</Text>
         </TouchableOpacity>
       </View>
