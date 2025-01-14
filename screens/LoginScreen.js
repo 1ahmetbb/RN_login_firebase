@@ -6,18 +6,40 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { use, useState, useEffect } from "react";
 import { auth } from "../firebase";
+import { useNavigation } from "@react-navigation/native";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigation = useNavigation()
+
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if(user){
+        navigation.navigate('Home')
+      }
+    });
+  }, []);
 
   const handleSignUp = () => {
-    auth.createUserWithEmailAndPassword(email, password).then(userCredentials => {
-      const user = userCredentials.user
-      console.log('kullanici: ',user.email)
-    }).catch(error => alert(error.message))
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log("kullanici: ", user.email);
+      })
+      .catch((error) => alert(error.message));
+  };
+  const handleLogin = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log("Kullanici giris yapti: ", user.email);
+      })
+      .catch((error) => alert(error.message));
   };
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -39,7 +61,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Giris Yap</Text>
         </TouchableOpacity>
 
